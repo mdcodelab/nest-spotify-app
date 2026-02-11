@@ -20,17 +20,17 @@ import { User } from './user/user.entity';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get('DB_HOST'),
-        port: Number(config.get('DB_PORT')),
+        host: config.get('B_HOST'),       // observă B_HOST
+        port: +config.get('DB_PORT'),
         username: config.get('DB_USER'),
         password: config.get('DB_PASSWORD'),
         database: config.get('DB_NAME'),
         entities: [Bookmark, User],
-        synchronize: true,    // doar pentru dev
+        synchronize: true, // doar pentru development
       }),
     }),
 
-    // Modulele tale existente
+    // Modulele tale
     AuthModule,
     UserModule,
     BookmarkModule,
@@ -40,7 +40,6 @@ import { User } from './user/user.entity';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    // Middleware global
     consumer.apply(LoggerMiddleware).forRoutes('');
   }
 }
