@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException, 
+    UnauthorizedException } from '@nestjs/common';
 import { AuthDto } from '../dto';
 import * as argon2 from 'argon2';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
@@ -11,6 +13,7 @@ export class AuthService {
     constructor(
         @InjectRepository(User)
         private readonly userRepository: Repository<User>,
+        private readonly jwtService: JwtService,
     ){}
 
     async register(dto: AuthDto){
@@ -21,7 +24,7 @@ export class AuthService {
         })
         
         if(existing){
-            throw new Error('Email already exists');
+            throw new ConflictException('Email already exists');
         }
 
         const hash = await argon2.hash(dto.password);
@@ -31,13 +34,39 @@ export class AuthService {
             firstName: dto.firstName,
             lastName: dto.lastName,
         })
+
         await this.userRepository.save(newUser);
+        delete (newUser as any).password;
 
-
-        return { msg: 'You have registered', newUser };
+        return newUser;
     } 
 
-    login(dto: AuthDto){
-        return { msg: 'I have logged in', dto };
+    async login(dto: AuthDto) {
+        const user = await this.userRepository.findOne({
+            where: {
+                email: dto.email
+            }
+        });
+
+        if (!user) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
+        const passwordMatch = await argon2.verify(user.password, dto.password);
+        
+        if (!passwordMatch) {
+            throw new UnauthorizedException('Invalid credentials');
+        }
+
+        const payload = { 
+            sub: user.id, 
+            email: user.email 
+        };
+
+        const token = await this.jwtService.signAsync(payload);
+
+        return {
+            access_token: token,
+        };
     }
 }

@@ -22,5 +22,5 @@ export class Bookmark {
   updatedAt: Date;
 
   @ManyToOne(() => User, user => user.bookmarks, { nullable: true })
-  user?: User; // legătura opțională către user
+  user: User; // legătura opțională către user
 }
