@@ -40,5 +40,10 @@ deleteUser(@Param('id') id: string) {
   return this.userService.deleteUser(id);
 }
 
+@Get(':id')
+getUser(@Param('id') id: string) {
+  return this.userService.findOne(id);
+}
+
 }
 

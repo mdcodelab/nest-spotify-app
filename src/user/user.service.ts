@@ -70,4 +70,18 @@ export class UserService {
         await this.userRepository.remove(user);
         return user;
     }
+
+
+    async findOne(id: string) {
+        const user = await this.userRepository.findOne({
+            where: {
+                id
+            },
+            relations: ['bookmarks']
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        return user;
+    }
 }
