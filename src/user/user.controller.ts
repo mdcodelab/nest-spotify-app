@@ -5,7 +5,7 @@ import { UserService } from './user.service';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { Role } from './user.entity';
-import { AuthDto } from '../auth/dto';
+import { UpdateUserDto } from './dto/update.user.dto';
 
 
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -24,7 +24,7 @@ export class UserController {
   }
 
   @Patch("profile")
-  updateProfile(@Req() req: any, @Body() dto: AuthDto){
+  updateProfile(@Req() req: any, @Body() dto: UpdateUserDto){
     return this.userService.updateProfile(req.user, dto);
   }
 

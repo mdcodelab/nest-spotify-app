@@ -2,9 +2,8 @@ import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { AuthDto } from '../auth/dto';
+import { UpdateUserDto } from './dto/update.user.dto';
 import argon2 from 'argon2';
-import { Role } from './user.entity';
 
 
 @Injectable()
@@ -19,7 +18,7 @@ export class UserService {
     }
 
 
-    async updateProfile(user: User, dto: AuthDto){
+    async updateProfile(user: User, dto: UpdateUserDto){
         const existingUser = await this.userRepository.findOne({
             where: {
                 email: dto.email
@@ -34,7 +33,6 @@ export class UserService {
         }
         user.firstName = dto.firstName || user.firstName;
         user.lastName = dto.lastName || user.lastName;
-        user.role = dto.role as Role || user.role;
 
         await this.userRepository.save(user);
         delete (user as any).password;
