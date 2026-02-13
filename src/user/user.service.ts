@@ -1,7 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { AuthDto } from '../auth/dto';
+import argon2 from 'argon2';
+import { Role } from './user.entity';
+
 
 @Injectable()
 export class UserService {
@@ -12,5 +16,29 @@ export class UserService {
 
     async findAllUsers() {
         return this.userRepository.find()
+    }
+
+
+    async updateProfile(user: User, dto: AuthDto){
+        const existingUser = await this.userRepository.findOne({
+            where: {
+                email: dto.email
+            }
+        });
+        if(existingUser && existingUser.id !== user.id){
+            throw new ConflictException('Email already exists');
+        }
+        user.email = dto.email || user.email;
+        if (dto.password) {
+            user.password = await argon2.hash(dto.password);
+        }
+        user.firstName = dto.firstName || user.firstName;
+        user.lastName = dto.lastName || user.lastName;
+        user.role = dto.role as Role || user.role;
+
+        await this.userRepository.save(user);
+        delete (user as any).password;
+
+        return user;
     }
 }
