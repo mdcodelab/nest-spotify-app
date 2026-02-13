@@ -1,13 +1,24 @@
-import { Entity, PrimaryGeneratedColumn, Column, 
-    CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  OneToMany,
+} from 'typeorm';
 import { Bookmark } from '../bookmark/bookmark.entity';
+
+export enum Role {
+  USER = 'user',
+  ADMIN = 'admin',
+}
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({unique: true})
+  @Column({ unique: true })
   email: string;
 
   @Column()
@@ -19,6 +30,13 @@ export class User {
   @Column({ nullable: true })
   lastName?: string;
 
+  @Column({
+    type: 'enum',
+    enum: Role,
+    default: Role.USER,
+  })
+  role: Role;
+
   @CreateDateColumn()
   createdAt: Date;
 
@@ -26,5 +44,5 @@ export class User {
   updatedAt: Date;
 
   @OneToMany(() => Bookmark, bookmark => bookmark.user)
-  bookmarks: Bookmark[]; // asta corespunde la user => user.bookmarks
+  bookmarks: Bookmark[];
 }

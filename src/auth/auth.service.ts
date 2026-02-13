@@ -7,8 +7,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/user/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import type { Response } from 'express';
-
-
+import { Role } from 'src/user/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -35,6 +34,7 @@ export class AuthService {
             password: hash,
             firstName: dto.firstName,
             lastName: dto.lastName,
+            role: (dto.role as Role) || Role.USER,
         })
 
         await this.userRepository.save(newUser);
@@ -62,7 +62,8 @@ export class AuthService {
 
         const payload = { 
             sub: user.id, 
-            email: user.email 
+            email: user.email,
+            role: user.role,
         };
 
         const token = await this.jwtService.signAsync(payload);

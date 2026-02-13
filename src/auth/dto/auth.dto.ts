@@ -17,4 +17,8 @@ export class AuthDto {
     @IsString()
     @IsOptional()
     lastName?: string;
+
+    @IsString()
+    @IsOptional()
+    role?: string;
 }

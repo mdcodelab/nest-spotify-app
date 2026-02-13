@@ -1,16 +1,26 @@
 import {Controller, Req, Get, Patch, UseGuards,
 } from '@nestjs/common';
-import { User } from "../user/user.entity";
 import { JwtAuthGuard} from '../auth/guards/auth.guards';
 import { UserService } from './user.service';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { Role } from './user.entity';
 
-@UseGuards(JwtAuthGuard)
+
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
-  @Get('me')
+  @Get('profile')
   getMe(@Req() req: any) {
     return req.user;
   }
+
+  @Roles(Role.ADMIN)
+  @Get("admin")
+  getAllUsers(@Req() req: any) {
+    return this.userService.findAllUsers();
+  }
+
 }
 
