@@ -1,4 +1,4 @@
-import {Controller, Req, Get, Patch, Body, UseGuards,
+import {Controller, Req, Get, Patch, Body, UseGuards, Param
 } from '@nestjs/common';
 import { JwtAuthGuard} from '../auth/guards/auth.guards';
 import { UserService } from './user.service';
@@ -27,6 +27,12 @@ export class UserController {
   updateProfile(@Req() req: any, @Body() dto: UpdateUserDto){
     return this.userService.updateProfile(req.user, dto);
   }
+
+  @Roles(Role.ADMIN)
+@Patch(':id/role')
+updateRole(@Param('id') id: string, @Body('role') role: Role) {
+  return this.userService.updateRole(id, role);
+}
 
 }
 

@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { UpdateUserDto } from './dto/update.user.dto';
 import argon2 from 'argon2';
+import { Role } from './user.entity';
+import { NotFoundException } from '@nestjs/common';
+
 
 
 @Injectable()
@@ -37,6 +40,21 @@ export class UserService {
         await this.userRepository.save(user);
         delete (user as any).password;
 
+        return user;
+    }
+
+
+    async updateRole(id: string, role: Role) {
+        const user = await this.userRepository.findOne({
+            where: {
+                id
+            }
+        });
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+        user.role = role;
+        await this.userRepository.save(user);
         return user;
     }
 }
