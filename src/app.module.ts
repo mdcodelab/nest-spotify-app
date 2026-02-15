@@ -10,8 +10,6 @@ import { BookmarkModule } from './bookmark/bookmark.module';
 import { Bookmark } from './bookmark/bookmark.entity';
 import { User } from './user/user.entity';
 import { RedisModule } from './redis/redis.module';
-import { BookmarksService } from './bookmark/bookmark.service';
-import { BookmarksController } from './bookmark/bookmark.controller';
 
 @Module({
   imports: [
@@ -39,8 +37,8 @@ import { BookmarksController } from './bookmark/bookmark.controller';
     BookmarkModule,
     RedisModule,
   ],
-  controllers: [AppController, BookmarksController],
-  providers: [AppService, BookmarksService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
