@@ -10,6 +10,9 @@ import { BookmarkModule } from './bookmark/bookmark.module';
 import { Bookmark } from './bookmark/bookmark.entity';
 import { User } from './user/user.entity';
 import { RedisModule } from './redis/redis.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RateLimitGuard } from './auth/guards/rate.limiting';
+
 
 @Module({
   imports: [
@@ -38,7 +41,13 @@ import { RedisModule } from './redis/redis.module';
     RedisModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RateLimitGuard,
+    },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
